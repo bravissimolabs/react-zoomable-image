@@ -12,6 +12,7 @@
 zoom.js
 yarn.lock
 package.json
+build/index.html
 
 # misc
 .DS_Store
