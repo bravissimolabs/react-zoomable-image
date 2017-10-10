@@ -83,7 +83,8 @@ class ZoomableImage extends Component {
       calcMovementFromDrag: false,
       pageClickHandlersAreAdded: false,
       transitionZoomBackground: true,
-      bodyClickHandlers: [['click', this.endZoom], ['touchstart', this.checkForTap], ['touchend', this.onTouchEnd]],
+      isStartingZoom: false,
+      isEndingZoom: false
     };
   }
 
@@ -93,6 +94,7 @@ class ZoomableImage extends Component {
    * React synthetic events
    */
   componentDidMount() {
+    this.bodyClickHandlers = [['click', this.endZoom], ['touchstart', this.checkForTap], ['touchend', this.onTouchEnd]];
     let passiveSupported = false;
     try {
       const options = Object.defineProperty({}, 'passive', {
@@ -124,7 +126,9 @@ class ZoomableImage extends Component {
     this.removeBodyClickHandlers();
   }
 
+
   startZoom = (initialFocalPoint, isTouchDevice) => {
+    if (isTouchDevice) this.setState({ calcMovementFromDrag: true });
     if (!isEqual(this.state.viewWindowPosition, initialFocalPoint)) {
       const { baseImage: { width }, largeImage } = this.props;
       const largeWidth = largeImage.width;
@@ -145,25 +149,29 @@ class ZoomableImage extends Component {
         calcMovementFromDrag: isTouchDevice,
       });
     }
-    this.addBodyClickHandlers();
     this.setState({
       zoomed: 1,
       zoomLevel: this.state.defaultZoomLevel,
       pageClickHandlersAreAdded: true,
+      isStartingZoom: true
     });
 
     // Turning off transitions so there is no delay between mousemove and the background
     // image repositioning
     setTimeout(
-      () =>
+      () => {
+        this.addBodyClickHandlers();
         this.setState({
           transitionZoomBackground: false,
-        }),
-      this.props.zoomTransitionTime,
+          isStartingZoom: false
+        });
+      },
+      this.props.zoomTransitionTime
     );
   };
 
   endZoom = (e) => {
+    console.log('endning');
     e.preventDefault();
     e.stopPropagation();
     const zoomLevel = this.props.baseImage.width / this.props.largeImage.width;
@@ -174,20 +182,23 @@ class ZoomableImage extends Component {
       zoomLevel,
       pageClickHandlersAreAdded: false,
       transitionZoomBackground: true,
+      isEndingZoom: true
     });
+    setTimeout(() => {
+      this.setState({ isEndingZoom: false });
+    }, this.props.zoomTransitionTime);
   };
 
   onZoomWindowTouchStart = (e) => {
     e.preventDefault();
     e.stopPropagation();
-
     if (e.targetTouches) {
       this.setState({
         isDragging: true,
         previousDragPosition: [e.targetTouches[0].clientX, e.targetTouches[0].clientY],
       });
-      this.checkForTap();
     }
+    this.checkForTap();
   };
 
   onTouchEnd = (e) => {
@@ -206,16 +217,18 @@ class ZoomableImage extends Component {
    */
   addBodyClickHandlers = () => {
     if (document && document.querySelector) {
-      this.state.bodyClickHandlers.forEach((handler) => {
-        document.querySelector('body').addEventListener(...handler);
+      if (!this.bodyElement) this.bodyElement = document.querySelector('body');
+      this.bodyClickHandlers.forEach((handler) => {
+        console.log(handler);
+        this.bodyElement.addEventListener(...handler);
       });
     }
   };
 
   removeBodyClickHandlers = () => {
     if (document && document.querySelector) {
-      this.state.bodyClickHandlers.forEach((handler) => {
-        document.querySelector('body').removeEventListener(...handler);
+      this.bodyClickHandlers.forEach((handler) => {
+        this.bodyElement.removeEventListener(...handler);
       });
     }
   };
@@ -246,6 +259,7 @@ class ZoomableImage extends Component {
       const currentDragPosition = [e.targetTouches[0].clientX, e.targetTouches[0].clientY];
 
       // Translate the view window focal point by the drag distance
+      // TODO: scale by zoom level
       const newFocus = zipWith(viewWindowPosition, currentDragPosition, previousDragPosition, (f, c, p) => f + (p - c));
 
       if (isInBounds(newFocus, largeImageSize)) {
@@ -261,7 +275,7 @@ class ZoomableImage extends Component {
 
   checkForTap = () => {
     this.setState({ listeningForSingleClick: true });
-    setTimeout(() => this.setState({ listeningForSingleClick: false }), 250);
+    setTimeout(() => this.setState({ listeningForSingleClick: false }), 200);
   };
 
   pauseZoom = () => this.setState({ isCalculatingZoom: true });
@@ -291,9 +305,19 @@ class ZoomableImage extends Component {
    * @returns {*}
    */
   render() {
-    const { baseImage, largeImage, thumbnailImage, displayMap, zoomTransitionTime, mapBorderColor } = this.props;
+    const { baseImage, largeImage, thumbnailImage, displayMap, zoomTransitionTime, mapBorderColor, mapScaleFactor } = this.props;
 
-    const { zoomed, viewWindowPosition, zoomLevel, calcMovementFromDrag, transitionZoomBackground } = this.state;
+    const {
+      zoomed,
+      viewWindowPosition,
+      zoomLevel,
+      calcMovementFromDrag,
+      transitionZoomBackground,
+      isStartingZoom,
+      listeningForSingleClick,
+      isEndingZoom,
+      isTouch
+    } = this.state;
 
     const { width, height } = baseImage;
     const largeWidth = largeImage.width;
@@ -306,9 +330,32 @@ class ZoomableImage extends Component {
 
     return (
       <div
+        data-name="wrapper"
         style={[styles.wrapper, { width, height, cursor: `url(${zoomed ? magMinus : magPlus}), pointer` }]}
-        onClick={(e) => {
-          this.startZoom([e.nativeEvent.offsetX, e.nativeEvent.offsetY], false);
+        onMouseDown={(e) => {
+          if (!zoomed && !isTouch) {
+            this.startZoom([e.nativeEvent.offsetX, e.nativeEvent.offsetY], false);
+          }
+        }}
+        onTouchStart={(e) => {
+          if (!zoomed) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.setState({ listeningForSingleClick: true, isTouch: true });
+            setTimeout(() => {
+              this.setState({ listeningForSingleClick: false });
+            }, 200);
+            setTimeout(() => {
+              this.setState({ isTouch: false });
+            }, 2000);
+          }
+        }}
+        onTouchEnd={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (!zoomed && listeningForSingleClick && !isEndingZoom) {
+            this.startZoom([e.changedTouches[0].clientX, e.changedTouches[0].clientY], true);
+          }
         }}
       >
         <img
@@ -323,6 +370,7 @@ class ZoomableImage extends Component {
           ]}
         />
         <div
+          data-name="zoom-wrapper"
           ref={(domNode) => {
             this.zoomContainer = domNode;
           }}
@@ -335,15 +383,16 @@ class ZoomableImage extends Component {
               style={[
                 styles.innerMap,
                 {
-                  width: width * 0.2,
-                  height: height * 0.2,
+                  width: width * mapScaleFactor,
+                  height: height * mapScaleFactor,
                   zIndex: zoomed * 200,
                   border: `2px solid ${mapBorderColor}`,
                 },
               ]}
             >
-              <img style={styles.innerMapImage} src={thumbnailImage.src} alt="thumbnail" />
+              <img style={styles.innerMapImage} src={thumbnailImage.src} alt={thumbnailImage.alt || 'thumbnail'} />
               <div
+                data-name="map-highlight"
                 style={[
                   styles.innerMapHighlightBox,
                   {
@@ -357,7 +406,10 @@ class ZoomableImage extends Component {
             </div>
           )}
           <div
-            onClick={this.endZoom}
+            data-name="zoom-image"
+            onClick={(e) => {
+              if (zoomed && !isStartingZoom) this.endZoom(e);
+            }}
             style={[
               styles.zoomedImage,
               {
@@ -365,7 +417,7 @@ class ZoomableImage extends Component {
                 height,
                 zIndex: zoomed * 110,
                 backgroundPosition: viewWindowPercent.map(p => `${p}%`).join(' '),
-                backgroundSize: `${largeWidth * zoomLevel}px ${largeHeight * zoomLevel}px`,
+                backgroundSize: `${Math.round(largeWidth * zoomLevel)}px ${Math.round(largeHeight * zoomLevel)}px`,
                 backgroundImage: `url(${largeImage.src})`,
                 transition: transitionZoomBackground ? `background-size ${zoomTransitionTime}ms ease-in-out` : 'none',
               },
@@ -380,15 +432,19 @@ class ZoomableImage extends Component {
 const imageShape = {
   alt: PropTypes.string.isRequired,
   src: PropTypes.string.isRequired,
+};
+const sizedImageShape = {
+  ...imageShape,
   width: PropTypes.number.isRequired,
   height: PropTypes.number.isRequired,
 };
 
 ZoomableImage.propTypes = {
-  baseImage: PropTypes.shape(imageShape).isRequired,
+  baseImage: PropTypes.shape(sizedImageShape).isRequired,
   displayMap: PropTypes.bool,
-  largeImage: PropTypes.shape(imageShape).isRequired,
+  largeImage: PropTypes.shape(sizedImageShape).isRequired,
   mapBorderColor: PropTypes.string,
+  mapScaleFactor: PropTypes.number,
   thumbnailImage: PropTypes.shape(imageShape).isRequired,
   zoomTransitionTime: PropTypes.number,
 };
@@ -397,6 +453,7 @@ ZoomableImage.defaultProps = {
   zoomTransitionTime: 300,
   displayMap: true,
   mapBorderColor: 'grey',
+  mapScaleFactor: 0.2
 };
 
 export default Radium(ZoomableImage);
