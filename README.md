@@ -57,11 +57,11 @@ thumbnailType: {
 | Property           | Type          | Description                                                                                                   |
 |--------------------|---------------|---------------------------------------------------------------------------------------------------------------|
 | baseImage          | imageType     | The initial image with no zoom applied. Rendered as an image element, with supplied width and height          |
-| largeImage         | imageType     | The zoomed image. Width and height, relative to baseImage's width and height, determine initial zoom level    |
-| thumbnailImage     | thumbnailType | Small "map" image displayed in top left corner during zoom. Will be rendered as 1/5 the size of the baseImage |
+| largeImage         | imageType     | The zoomed image. Width and height, relative to `baseImage`'s width and height, determine initial zoom level    |
+| thumbnailImage     | thumbnailType | Small "map" image displayed in top left corner during zoom. Size determined by `mapScaleFactor` |
 | displayMap         | bool          | Should a thumbnail map image be shown? Defaults to true                                                       |
 | mapBorderColor     | string        | Color of border around the thumbnail map image                                                                |
-| mapScaleFactor     | number        | Size of thumbnail map, relative to baseImage. Defaults to 0.2                                                 |
+| mapScaleFactor     | number        | Size of thumbnail map, relative to `baseImage`. Defaults to 0.2                                                 |
 | zoomTransitionTime | number        | Duration of zoom-in and zoom-out transitions. Defaults to 300                                                 |
 
 ## Tests
