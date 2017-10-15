@@ -442,7 +442,7 @@ ZoomableImage.propTypes = {
   largeImage: PropTypes.shape(sizedImageShape).isRequired,
   mapBorderColor: PropTypes.string,
   mapScaleFactor: PropTypes.number,
-  thumbnailImage: PropTypes.shape(imageShape).isRequired,
+  thumbnailImage: PropTypes.shape(imageShape),
   zoomTransitionTime: PropTypes.number,
 };
 
@@ -450,7 +450,8 @@ ZoomableImage.defaultProps = {
   zoomTransitionTime: 300,
   displayMap: true,
   mapBorderColor: 'grey',
-  mapScaleFactor: 0.2
+  mapScaleFactor: 0.2,
+  thumbnailImage: { alt: '', src: '' }
 };
 
 export default Radium(ZoomableImage);
