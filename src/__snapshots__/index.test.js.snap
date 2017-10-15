@@ -1,0 +1,113 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Product Gallery Zoom should render correctly 1`] = `
+<div
+  data-name="wrapper"
+  data-radium={true}
+  onMouseDown={[Function]}
+  onTouchEnd={[Function]}
+  onTouchStart={[Function]}
+  style={
+    Object {
+      "cursor": "url(mocked-file), pointer",
+      "height": 550,
+      "position": "relative",
+      "width": 350,
+      "zIndex": 1,
+    }
+  }
+>
+  <img
+    alt="An image for test rendering"
+    data-radium={true}
+    src="http://via.placeholder.com/350x550"
+    style={
+      Object {
+        "height": "100%",
+        "position": "relative",
+        "transitionDelay": "300ms",
+        "transitionProperty": "z-index",
+        "width": "100%",
+        "zIndex": 1,
+      }
+    }
+  />
+  <div
+    data-name="zoom-wrapper"
+    data-radium={true}
+    onMouseMove={[Function]}
+    onWheel={[Function]}
+    style={
+      Object {
+        "height": 550,
+        "position": "absolute",
+        "top": 0,
+        "width": 350,
+        "zIndex": 0,
+      }
+    }
+  >
+    <div
+      data-radium={true}
+      style={
+        Object {
+          "border": "2px solid grey",
+          "height": 110,
+          "left": 10,
+          "pointerEvents": "none",
+          "position": "absolute",
+          "top": 10,
+          "width": 70,
+          "zIndex": 0,
+        }
+      }
+    >
+      <img
+        alt="A small image for test rendering"
+        data-radium={true}
+        src="http://via.placeholder.com/70x110"
+        style={
+          Object {
+            "height": "auto",
+            "width": "101%",
+          }
+        }
+      />
+      <div
+        data-name="map-highlight"
+        data-radium={true}
+        style={
+          Object {
+            "backgroundColor": "rgba(140, 137, 131, 0.6)",
+            "height": "100%",
+            "left": "0%",
+            "position": "absolute",
+            "top": "0%",
+            "width": "100%",
+          }
+        }
+      />
+    </div>
+    <div
+      data-name="zoom-image"
+      data-radium={true}
+      onClick={[Function]}
+      style={
+        Object {
+          "backgroundColor": "transparent",
+          "backgroundImage": "url(http://via.placeholder.com/450x707)",
+          "backgroundPosition": "0% 0%",
+          "backgroundRepeat": "no-repeat",
+          "backgroundSize": "350px 550px",
+          "height": 550,
+          "position": "absolute",
+          "top": 0,
+          "transition": "background-size 300ms ease-in-out",
+          "width": 350,
+          "zIndex": 0,
+        }
+      }
+    />
+  </div>
+</div>
+`;
