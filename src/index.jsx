@@ -134,10 +134,9 @@ class ZoomableImage extends Component {
       const largeWidth = largeImage.width;
       const largeHeight = largeImage.height;
       const largeImageSize = [largeWidth, largeHeight];
-      const { defaultZoomLevel } = this.state;
 
       let startingFocus = isTouchDevice
-        ? initialFocalPoint.map(p => p * defaultZoomLevel * (largeWidth / width))
+        ? initialFocalPoint.map(p => p * (largeWidth / width))
         : initialFocalPoint;
 
       if (isTouchDevice && !isInBounds(startingFocus, largeImageSize)) {
@@ -171,7 +170,6 @@ class ZoomableImage extends Component {
   };
 
   endZoom = (e) => {
-    console.log('endning');
     e.preventDefault();
     e.stopPropagation();
     const zoomLevel = this.props.baseImage.width / this.props.largeImage.width;
@@ -219,7 +217,6 @@ class ZoomableImage extends Component {
     if (document && document.querySelector) {
       if (!this.bodyElement) this.bodyElement = document.querySelector('body');
       this.bodyClickHandlers.forEach((handler) => {
-        console.log(handler);
         this.bodyElement.addEventListener(...handler);
       });
     }
@@ -250,17 +247,16 @@ class ZoomableImage extends Component {
 
     if (!this.state.calcMovementFromDrag) this.setState({ calcMovementFromDrag: true });
 
+    const { zoomLevel, previousDragPosition, viewWindowPosition } = this.state;
     const { largeImage } = this.props;
     const largeImageSize = [largeImage.width, largeImage.height];
-
-    const { previousDragPosition, viewWindowPosition } = this.state;
 
     if (e.targetTouches) {
       const currentDragPosition = [e.targetTouches[0].clientX, e.targetTouches[0].clientY];
 
       // Translate the view window focal point by the drag distance
-      // TODO: scale by zoom level
-      const newFocus = zipWith(viewWindowPosition, currentDragPosition, previousDragPosition, (f, c, p) => f + (p - c));
+      const dragScale = 3 / (zoomLevel * zoomLevel);
+      const newFocus = zipWith(viewWindowPosition, currentDragPosition, previousDragPosition, (f, c, p) => f + ((p - c) * dragScale));
 
       if (isInBounds(newFocus, largeImageSize)) {
         window.requestAnimationFrame(() => {
@@ -354,7 +350,8 @@ class ZoomableImage extends Component {
           e.preventDefault();
           e.stopPropagation();
           if (!zoomed && listeningForSingleClick && !isEndingZoom) {
-            this.startZoom([e.changedTouches[0].clientX, e.changedTouches[0].clientY], true);
+            const { x, y } = e.target.getBoundingClientRect();
+            this.startZoom([e.changedTouches[0].clientX - (x || 0), e.changedTouches[0].clientY - (y || 0)], true);
           }
         }}
       >
