@@ -27,7 +27,6 @@
     "hammerjs": "^2.0.8",
     "lodash": "^4.17.4",
     "prop-types": "^15.6.0",
-    "radium": "^0.19.4",
     "react": "^16.0.0",
     "webpack": "^3.6.0"
   },
