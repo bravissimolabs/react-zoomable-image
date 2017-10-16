@@ -3,7 +3,6 @@
 exports[`Product Gallery Zoom should render correctly 1`] = `
 <div
   data-name="wrapper"
-  data-radium={true}
   onMouseDown={[Function]}
   onTouchEnd={[Function]}
   onTouchStart={[Function]}
@@ -19,7 +18,6 @@ exports[`Product Gallery Zoom should render correctly 1`] = `
 >
   <img
     alt="An image for test rendering"
-    data-radium={true}
     src="http://via.placeholder.com/350x550"
     style={
       Object {
@@ -34,7 +32,6 @@ exports[`Product Gallery Zoom should render correctly 1`] = `
   />
   <div
     data-name="zoom-wrapper"
-    data-radium={true}
     onMouseMove={[Function]}
     onWheel={[Function]}
     style={
@@ -48,7 +45,6 @@ exports[`Product Gallery Zoom should render correctly 1`] = `
     }
   >
     <div
-      data-radium={true}
       style={
         Object {
           "border": "2px solid grey",
@@ -64,7 +60,6 @@ exports[`Product Gallery Zoom should render correctly 1`] = `
     >
       <img
         alt="A small image for test rendering"
-        data-radium={true}
         src="http://via.placeholder.com/70x110"
         style={
           Object {
@@ -75,7 +70,6 @@ exports[`Product Gallery Zoom should render correctly 1`] = `
       />
       <div
         data-name="map-highlight"
-        data-radium={true}
         style={
           Object {
             "backgroundColor": "rgba(140, 137, 131, 0.6)",
@@ -90,7 +84,6 @@ exports[`Product Gallery Zoom should render correctly 1`] = `
     </div>
     <div
       data-name="zoom-image"
-      data-radium={true}
       onClick={[Function]}
       style={
         Object {
