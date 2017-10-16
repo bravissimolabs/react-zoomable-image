@@ -1,11 +1,20 @@
 /* global document, window */
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { isEqual, zipWith } from 'lodash';
+import zipWith from 'lodash/zipWith';
 import { Manager, Pinch } from 'hammerjs';
 
 const magPlus = require('./magnify.svg');
 const magMinus = require('./magMinus.svg');
+
+const isEqual = (arr1, arr2) => {
+  for (let i = 0; i < arr1.length; i++) {
+    if (arr1[i] !== arr2[i]) {
+      return false;
+    }
+  }
+  return true;
+};
 
 const styles = {
   wrapper: {
@@ -326,7 +335,7 @@ class ZoomableImage extends Component {
     return (
       <div
         data-name="wrapper"
-        style={{ ...styles.wrapper,  width, height, cursor: `url(${zoomed ? magMinus : magPlus}), pointer` }}
+        style={{ ...styles.wrapper, width, height, cursor: `url(${zoomed ? magMinus : magPlus}), pointer` }}
         onMouseDown={(e) => {
           if (!zoomed && !isTouch) {
             this.startZoom([e.nativeEvent.offsetX, e.nativeEvent.offsetY], false);
@@ -370,7 +379,7 @@ class ZoomableImage extends Component {
           }}
           onMouseMove={this.calcBackgroundOffsetFromMouse}
           onWheel={this.handleZoom}
-          style={{ ...styles.zoomContainer,  width, height, zIndex: zoomed * 100 }}
+          style={{ ...styles.zoomContainer, width, height, zIndex: zoomed * 100 }}
         >
           {displayMap && (
             <div
@@ -380,7 +389,7 @@ class ZoomableImage extends Component {
                 height: height * mapScaleFactor,
                 zIndex: zoomed * 200,
                 border: `2px solid ${mapBorderColor}`,
-                
+
               }}
             >
               <img style={styles.innerMapImage} src={thumbnailImage.src} alt={thumbnailImage.alt || 'thumbnail'} />
