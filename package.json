@@ -1,6 +1,6 @@
 {
   "name": "react-zoomable-image",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "React component for zoomable images",
   "main": "build/index.js",
   "scripts": {
