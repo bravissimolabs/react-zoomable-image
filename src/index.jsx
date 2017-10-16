@@ -1,7 +1,6 @@
 /* global document, window */
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import Radium from 'radium';
 import { isEqual, zipWith } from 'lodash';
 import { Manager, Pinch } from 'hammerjs';
 
@@ -327,7 +326,7 @@ class ZoomableImage extends Component {
     return (
       <div
         data-name="wrapper"
-        style={[styles.wrapper, { width, height, cursor: `url(${zoomed ? magMinus : magPlus}), pointer` }]}
+        style={{ ...styles.wrapper,  width, height, cursor: `url(${zoomed ? magMinus : magPlus}), pointer` }}
         onMouseDown={(e) => {
           if (!zoomed && !isTouch) {
             this.startZoom([e.nativeEvent.offsetX, e.nativeEvent.offsetY], false);
@@ -358,13 +357,11 @@ class ZoomableImage extends Component {
         <img
           src={baseImage.src}
           alt={baseImage.alt}
-          style={[
-            styles.image,
-            {
-              zIndex: zoomed ? -1 : 1,
-              transitionDelay: `${zoomTransitionTime}ms`,
-            },
-          ]}
+          style={{
+            ...styles.image,
+            zIndex: zoomed ? -1 : 1,
+            transitionDelay: `${zoomTransitionTime}ms`,
+          }}
         />
         <div
           data-name="zoom-wrapper"
@@ -373,32 +370,29 @@ class ZoomableImage extends Component {
           }}
           onMouseMove={this.calcBackgroundOffsetFromMouse}
           onWheel={this.handleZoom}
-          style={[styles.zoomContainer, { width, height, zIndex: zoomed * 100 }]}
+          style={{ ...styles.zoomContainer,  width, height, zIndex: zoomed * 100 }}
         >
           {displayMap && (
             <div
-              style={[
-                styles.innerMap,
-                {
-                  width: width * mapScaleFactor,
-                  height: height * mapScaleFactor,
-                  zIndex: zoomed * 200,
-                  border: `2px solid ${mapBorderColor}`,
-                },
-              ]}
+              style={{
+                ...styles.innerMap,
+                width: width * mapScaleFactor,
+                height: height * mapScaleFactor,
+                zIndex: zoomed * 200,
+                border: `2px solid ${mapBorderColor}`,
+                
+              }}
             >
               <img style={styles.innerMapImage} src={thumbnailImage.src} alt={thumbnailImage.alt || 'thumbnail'} />
               <div
                 data-name="map-highlight"
-                style={[
-                  styles.innerMapHighlightBox,
-                  {
-                    width: `${baseToZoomRatio * 100}%`,
-                    height: `${baseToZoomRatio * 100}%`,
-                    left: `${viewWindowPercent[0] * (1 - baseToZoomRatio)}%`,
-                    top: `${viewWindowPercent[1] * (1 - baseToZoomRatio)}%`,
-                  },
-                ]}
+                style={{
+                  ...styles.innerMapHighlightBox,
+                  width: `${baseToZoomRatio * 100}%`,
+                  height: `${baseToZoomRatio * 100}%`,
+                  left: `${viewWindowPercent[0] * (1 - baseToZoomRatio)}%`,
+                  top: `${viewWindowPercent[1] * (1 - baseToZoomRatio)}%`,
+                }}
               />
             </div>
           )}
@@ -407,18 +401,16 @@ class ZoomableImage extends Component {
             onClick={(e) => {
               if (zoomed && !isStartingZoom) this.endZoom(e);
             }}
-            style={[
-              styles.zoomedImage,
-              {
-                width,
-                height,
-                zIndex: zoomed * 110,
-                backgroundPosition: viewWindowPercent.map(p => `${p}%`).join(' '),
-                backgroundSize: `${Math.round(largeWidth * zoomLevel)}px ${Math.round(largeHeight * zoomLevel)}px`,
-                backgroundImage: `url(${largeImage.src})`,
-                transition: transitionZoomBackground ? `background-size ${zoomTransitionTime}ms ease-in-out` : 'none',
-              },
-            ]}
+            style={{
+              ...styles.zoomedImage,
+              width,
+              height,
+              zIndex: zoomed * 110,
+              backgroundPosition: viewWindowPercent.map(p => `${p}%`).join(' '),
+              backgroundSize: `${Math.round(largeWidth * zoomLevel)}px ${Math.round(largeHeight * zoomLevel)}px`,
+              backgroundImage: `url(${largeImage.src})`,
+              transition: transitionZoomBackground ? `background-size ${zoomTransitionTime}ms ease-in-out` : 'none',
+            }}
           />
         </div>
       </div>
@@ -454,4 +446,4 @@ ZoomableImage.defaultProps = {
   thumbnailImage: { alt: '', src: '' }
 };
 
-export default Radium(ZoomableImage);
+export default ZoomableImage;
