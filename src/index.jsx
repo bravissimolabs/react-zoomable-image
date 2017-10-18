@@ -291,16 +291,16 @@ class ZoomableImage extends Component {
     const { zoomLevel } = this.state;
     if (!this.state.isCalculatingZoom && zoomLevel <= 2 && zoomLevel >= 0) {
       if ((e.type === 'pinchout' || e.deltaY < 0) && zoomLevel < 2) {
-        this.zoom(0.1);
+        this.zoom(0.05);
       } else if ((e.type === 'pinchin' || e.deltaY > 0) && zoomLevel > 1) {
-        this.zoom(-0.1);
+        this.zoom(-0.05);
       }
     }
   };
 
   zoom = (delta) => {
     this.pauseZoom();
-    const zoomLevel = Math.round((this.state.zoomLevel + delta) * 10) / 10;
+    const zoomLevel = Math.round((this.state.zoomLevel + delta) * 100) / 100;
     this.setState({ zoomLevel }, this.resumeZoom);
   };
 
